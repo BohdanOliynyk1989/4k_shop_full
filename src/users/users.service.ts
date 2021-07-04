@@ -5,11 +5,13 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {RolesService} from "../roles/roles.service";
 import {AddRoleDto} from "./dto/add-role.dto";
 import {BanUserDto} from "./dto/ban-user.dto";
+import { Basket } from 'src/basket/bascet.model';
 
 @Injectable()
 export class UsersService {
 
     constructor(@InjectModel(User) private userRepository: typeof User,
+                @InjectModel(Basket) private basket: typeof Basket,
                 private roleService: RolesService) {}
 
     async createUser(dto: CreateUserDto) {
@@ -17,6 +19,7 @@ export class UsersService {
         const role = await this.roleService.getRoleByValue("ADMIN")
         await user.$set('roles', [role.id])
         user.roles = [role]
+        await this.basket.create({userId: user.id})
         return user;
     }
 
